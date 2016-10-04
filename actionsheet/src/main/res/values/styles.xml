@@ -1,0 +1,6 @@
+<resources>
+    <style name="ActionSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/action_sheet_in</item>
+        <item name="android:windowExitAnimation">@anim/action_sheet_out</item>
+    </style>
+</resources>

@@ -1,0 +1,6 @@
+<resources>
+    <dimen name="action_sheet_padding">10dp</dimen>
+    <dimen name="action_sheet_btn_height">55dp</dimen>
+    <dimen name="action_sheet_btn_bg_corner">12dp</dimen>
+    <dimen name="action_sheet_btn_gap">0.5dp</dimen>
+</resources>
