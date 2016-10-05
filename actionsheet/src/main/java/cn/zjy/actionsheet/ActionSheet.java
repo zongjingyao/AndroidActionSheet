@@ -9,7 +9,6 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -86,7 +85,6 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
         return dialog;
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return createView();
