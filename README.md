@@ -22,4 +22,4 @@ actionSheet.show(getFragmentManager());
 ```
 
 ## Screenshot
-![screenshot](https://github.com/zongjingyao/AndroidActionSheet/blob/master/screenshot/example.png?raw=true)
+![screenshot](https://raw.githubusercontent.com/zongjingyao/AndroidActionSheet/master/screenshot/example.png)
