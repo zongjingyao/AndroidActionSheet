@@ -2,6 +2,13 @@
 ActionSheet on Android
 
 ## Usage
+### Add dependency
+```
+dependencies {
+    compile 'com.github.zongjingyao:actionsheet:0.1'
+}
+```
+### Example
 ```
 ActionSheet actionSheet = new ActionSheet.Builder()
     .setTitle("Title", Color.BLUE)
