@@ -28,8 +28,11 @@ public class MainActivity extends AppCompatActivity {
     private void showActionSheet() {
         ActionSheet actionSheet = new ActionSheet.Builder()
                 .setTitle("Title", Color.BLUE)
+                //.setTitleTextSize(20)
                 .setOtherBtn(new String[]{"Btn0", "Btn1", "Btn2"}, new int[]{Color.BLACK, Color.GREEN, Color.GREEN})
+                //.setOtherBtnTextSize(30)
                 .setCancelBtn("Cancel", Color.RED)
+                //.setCancelBtnTextSize(30)
                 .setCancelableOnTouchOutside(true)
                 .setActionSheetListener(new ActionSheet.ActionSheetListener() {
                     @Override

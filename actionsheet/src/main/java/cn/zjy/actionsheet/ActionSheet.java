@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,17 +27,27 @@ import android.widget.TextView;
 
 public class ActionSheet extends DialogFragment implements View.OnClickListener {
     public static final String TAG = "ActionSheet";
+
     public static final String TITLE = "title";
     public static final String TITLE_COLOR = "title_color";
+    public static final String TITLE_TEXT_SIZE = "title_text_size";
+
     public static final String CANCEL_BTN_TITLE = "cancel_btn_title";
     public static final String CANCEL_BTN_TITLE_COLOR = "cancel_btn_title_color";
+    public static final String CANCEL_BTN_TEXT_SIZE = "cancel_btn_text_size";
+
     public static final String OTHER_BTN_TITLES = "other_btn_titles";
     public static final String OTHER_BTN_TITLE_COLORS = "other_btn_title_colors";
+    public static final String OTHER_BTN_TEXT_SIZE = "other_btn_text_size";
+
     public static final String CANCELABLE_ON_TOUCH_OUTSIDE = "cancelable_on_touch_outside";
 
-    private static final int DEFAULT_TEXT_SIZE = 18;
+    private static final float DEFAULT_TITLE_TEXT_SIZE = 18;
+    private static final float DEFAULT_BTN_TEXT_SIZE = 20;
 
-    private int mDefaultColor = Color.BLACK;
+    private static final int DEFAULT_TITLE_TEXT_COLOR = Color.parseColor("#929292");
+    private static final int DEFAULT_BTN_TEXT_COLOR = Color.BLACK;
+
     private ActionSheetListener mActionSheetListener;
     private int mClickedBtnIdx = -1;
 
@@ -113,8 +122,9 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
         String title = args.getString(TITLE);
         if (TextUtils.isEmpty(title)) return;
 
-        int titleColor = args.getInt(TITLE_COLOR, mDefaultColor);
-        int titleHeight = (int) getActivity().getResources().getDimension(R.dimen.action_sheet_btn_height);
+        int titleColor = args.getInt(TITLE_COLOR, DEFAULT_TITLE_TEXT_COLOR);
+        float textSize = args.getFloat(TITLE_TEXT_SIZE, DEFAULT_TITLE_TEXT_SIZE);
+        int titleHeight = (int) getActivity().getResources().getDimension(R.dimen.action_sheet_title_height);
         int bottomMargin = (int) getActivity().getResources().getDimension(R.dimen.action_sheet_btn_gap);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 titleHeight);
@@ -127,7 +137,7 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
         }
         TextView tvTitle = new TextView(getActivity());
         tvTitle.setText(title);
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, DEFAULT_TEXT_SIZE);
+        tvTitle.setTextSize(textSize);
         tvTitle.setTextColor(titleColor);
         tvTitle.setGravity(Gravity.CENTER);
         tvTitle.setBackgroundResource(background);
@@ -140,6 +150,7 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
         if (titles == null || titles.length == 0) return;
 
         int[] colors = args.getIntArray(OTHER_BTN_TITLE_COLORS);
+        float textSize = args.getFloat(OTHER_BTN_TEXT_SIZE, DEFAULT_BTN_TEXT_SIZE);
         int btnHeight = (int) getActivity().getResources().getDimension(R.dimen.action_sheet_btn_height);
         int bottomMargin = (int) getActivity().getResources().getDimension(R.dimen.action_sheet_btn_gap);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -150,8 +161,9 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
         for (int i = 0; i < len; i++) {
             Button btn = new Button(getActivity());
             btn.setText(titles[i]);
-            btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, DEFAULT_TEXT_SIZE);
-            btn.setTextColor(colors != null && i < colors.length ? colors[i] : mDefaultColor);
+            btn.setAllCaps(false);
+            btn.setTextSize(textSize);
+            btn.setTextColor(colors != null && i < colors.length ? colors[i] : DEFAULT_BTN_TEXT_COLOR);
             btn.setTag(i);
             btn.setBackgroundResource(getOtherBtnBackground(i));
             btn.setOnClickListener(this);
@@ -192,7 +204,8 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
         String cancelTitle = args.getString(CANCEL_BTN_TITLE);
         if (TextUtils.isEmpty(cancelTitle)) return;
 
-        int cancelBtnColor = args.getInt(CANCEL_BTN_TITLE_COLOR, mDefaultColor);
+        int cancelBtnColor = args.getInt(CANCEL_BTN_TITLE_COLOR, DEFAULT_BTN_TEXT_COLOR);
+        float textSize = args.getFloat(CANCEL_BTN_TEXT_SIZE, DEFAULT_BTN_TEXT_SIZE);
         int btnHeight = (int) getActivity().getResources().getDimension(R.dimen.action_sheet_btn_height);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 btnHeight);
@@ -202,7 +215,8 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
 
         Button btnCancel = new Button(getActivity());
         btnCancel.setText(cancelTitle);
-        btnCancel.setTextSize(TypedValue.COMPLEX_UNIT_SP, DEFAULT_TEXT_SIZE);
+        btnCancel.setAllCaps(false);
+        btnCancel.setTextSize(textSize);
         btnCancel.setTextColor(cancelBtnColor);
         btnCancel.setOnClickListener(this);
         btnCancel.setBackgroundResource(R.drawable.action_sheet_cancel_btn_bg);
@@ -222,10 +236,13 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
     public static class Builder {
         private String mTitle;
         private int mTitleColor;
+        private float mTitleTextSize = -1;
         private String mCancelBtnTitle;
         private int mCancelBtnTitleColor;
+        private float mCancelBtnTextSize = -1;
         private String[] mOtherBtnTitles;
         private int[] mOtherBtnTitleColors;
+        private float mOtherBtnTextSize = -1;
         private boolean mCancelableOnTouchOutside;
         private ActionSheetListener mActionSheetListener;
 
@@ -235,15 +252,30 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
             return this;
         }
 
+        public Builder setTitleTextSize(float textSize) {
+            mTitleTextSize = textSize;
+            return this;
+        }
+
         public Builder setCancelBtn(String title, int titleColor) {
             mCancelBtnTitle = title;
             mCancelBtnTitleColor = titleColor;
             return this;
         }
 
+        public Builder setCancelBtnTextSize(float textSize) {
+            mCancelBtnTextSize = textSize;
+            return this;
+        }
+
         public Builder setOtherBtn(String[] titles, int[] titleColors) {
             mOtherBtnTitles = titles;
             mOtherBtnTitleColors = titleColors;
+            return this;
+        }
+
+        public Builder setOtherBtnTextSize(float textSize) {
+            mOtherBtnTextSize = textSize;
             return this;
         }
 
@@ -261,10 +293,19 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
             Bundle bundle = new Bundle();
             bundle.putString(TITLE, mTitle);
             bundle.putInt(TITLE_COLOR, mTitleColor);
+            if (mTitleTextSize > 0) {
+                bundle.putFloat(TITLE_TEXT_SIZE, mTitleTextSize);
+            }
             bundle.putString(CANCEL_BTN_TITLE, mCancelBtnTitle);
             bundle.putInt(CANCEL_BTN_TITLE_COLOR, mCancelBtnTitleColor);
+            if (mCancelBtnTextSize > 0) {
+                bundle.putFloat(CANCEL_BTN_TEXT_SIZE, mCancelBtnTextSize);
+            }
             bundle.putStringArray(OTHER_BTN_TITLES, mOtherBtnTitles);
             bundle.putIntArray(OTHER_BTN_TITLE_COLORS, mOtherBtnTitleColors);
+            if (mOtherBtnTextSize > 0) {
+                bundle.putFloat(OTHER_BTN_TEXT_SIZE, mOtherBtnTextSize);
+            }
             bundle.putBoolean(CANCELABLE_ON_TOUCH_OUTSIDE, mCancelableOnTouchOutside);
 
             ActionSheet actionSheet = new ActionSheet();
