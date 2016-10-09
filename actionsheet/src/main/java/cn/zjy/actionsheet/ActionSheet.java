@@ -1,6 +1,5 @@
 package cn.zjy.actionsheet;
 
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -79,27 +78,32 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
+    public void onStart() {
+        super.onStart();
 
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            window.setGravity(Gravity.BOTTOM | Gravity.LEFT | Gravity.RIGHT);
-            WindowManager.LayoutParams params = window.getAttributes();
-            params.windowAnimations = R.style.ActionSheetAnimation;
-            window.setAttributes(params);
-        }
-
-        return dialog;
+        Window window = getDialog().getWindow();
+        if (window == null) return;
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        window.setGravity(Gravity.BOTTOM | Gravity.LEFT | Gravity.RIGHT);
+        WindowManager.LayoutParams params = window.getAttributes();
+        params.windowAnimations = R.style.ActionSheetAnimation;
+        params.width = WindowManager.LayoutParams.MATCH_PARENT;
+        window.setAttributes(params);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Window window = getDialog().getWindow();
+        if (window != null) {
+            getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        }
         return createView();
     }
 
     private View createView() {
+        Bundle args = getArguments();
+        getDialog().setCanceledOnTouchOutside(args.getBoolean(CANCELABLE_ON_TOUCH_OUTSIDE, true));
+
         Context context = getActivity();
         LinearLayout layout = new LinearLayout(context);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
