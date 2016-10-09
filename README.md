@@ -5,7 +5,7 @@ ActionSheet on Android
 ### Add dependency
 ```
 dependencies {
-    compile 'com.github.zongjingyao:actionsheet:0.1'
+    compile 'com.github.zongjingyao:actionsheet:0.1.2'
 }
 ```
 ### Example
