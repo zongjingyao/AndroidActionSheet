@@ -8,7 +8,11 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,14 +42,19 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
     public static final String OTHER_BTN_TITLES = "other_btn_titles";
     public static final String OTHER_BTN_TITLE_COLORS = "other_btn_title_colors";
     public static final String OTHER_BTN_TEXT_SIZE = "other_btn_text_size";
+    public static final String OTHER_BTN_SUB_TITLES = "other_btn_sub_titles";
+    public static final String OTHER_BTN_SUB_TITLE_COLORS = "other_btn_sub_title_colors";
+    public static final String OTHER_BTN_SUB_TEXT_SIZE = "other_btn_sub_text_size";
 
     public static final String CANCELABLE_ON_TOUCH_OUTSIDE = "cancelable_on_touch_outside";
 
     private static final float DEFAULT_TITLE_TEXT_SIZE = 18;
     private static final float DEFAULT_BTN_TEXT_SIZE = 20;
+    private static final float DEFAULT_BTN_SUB_TEXT_SIZE = 15;
 
     private static final int DEFAULT_TITLE_TEXT_COLOR = Color.parseColor("#929292");
     private static final int DEFAULT_BTN_TEXT_COLOR = Color.BLACK;
+    private static final int DEFAULT_BTN_SUB_TEXT_COLOR = Color.parseColor("#929292");
 
     private ActionSheetListener mActionSheetListener;
     private int mClickedBtnIdx = -1;
@@ -153,8 +162,11 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
         String[] titles = args.getStringArray(OTHER_BTN_TITLES);
         if (titles == null || titles.length == 0) return;
 
-        int[] colors = args.getIntArray(OTHER_BTN_TITLE_COLORS);
+        int[] titleColors = args.getIntArray(OTHER_BTN_TITLE_COLORS);
         float textSize = args.getFloat(OTHER_BTN_TEXT_SIZE, DEFAULT_BTN_TEXT_SIZE);
+        String[] subTitles = args.getStringArray(OTHER_BTN_SUB_TITLES);
+        int[] subTitleColors = args.getIntArray(OTHER_BTN_SUB_TITLE_COLORS);
+        float subTextSize = args.getFloat(OTHER_BTN_SUB_TEXT_SIZE, DEFAULT_BTN_SUB_TEXT_SIZE);
         int btnHeight = (int) getActivity().getResources().getDimension(R.dimen.action_sheet_btn_height);
         int bottomMargin = (int) getActivity().getResources().getDimension(R.dimen.action_sheet_btn_gap);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -163,14 +175,36 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
 
         int len = titles.length;
         for (int i = 0; i < len; i++) {
+            int titleColor = titleColors != null && i < titleColors.length ? titleColors[i] : DEFAULT_BTN_TEXT_COLOR;
+            int subTitleColor = subTitleColors != null && i < subTitleColors.length ? subTitleColors[i] : DEFAULT_BTN_SUB_TEXT_COLOR;
+
             Button btn = new Button(getActivity());
-            btn.setText(titles[i]);
             btn.setAllCaps(false);
-            btn.setTextSize(textSize);
-            btn.setTextColor(colors != null && i < colors.length ? colors[i] : DEFAULT_BTN_TEXT_COLOR);
             btn.setTag(i);
             btn.setBackgroundResource(getOtherBtnBackground(i));
             btn.setOnClickListener(this);
+            btn.setPadding(0, 0, 0, 0);
+            if (subTitles != null && i < subTitles.length && !TextUtils.isEmpty(subTitles[i])) {
+                int titleLength = titles[i].length() + 1;
+                int subTitleLength = subTitles[i].length();
+
+                SpannableStringBuilder builder = new SpannableStringBuilder(titles[i] + "\n" + subTitles[i]);
+                ForegroundColorSpan titleColorSpan = new ForegroundColorSpan(titleColor);
+                AbsoluteSizeSpan titleSizeSpan = new AbsoluteSizeSpan((int) textSize, true);
+                builder.setSpan(titleColorSpan, 0, titleLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                builder.setSpan(titleSizeSpan, 0, titleLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                ForegroundColorSpan subTitleColorSpan = new ForegroundColorSpan(subTitleColor);
+                AbsoluteSizeSpan subTitleSizeSpan = new AbsoluteSizeSpan((int) subTextSize, true);
+                builder.setSpan(subTitleColorSpan, titleLength, titleLength + subTitleLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                builder.setSpan(subTitleSizeSpan, titleLength, titleLength + subTitleLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                btn.setText(builder);
+            } else {
+                btn.setText(titles[i]);
+                btn.setTextSize(textSize);
+                btn.setTextColor(titleColor);
+            }
             layout.addView(btn, lp);
         }
     }
@@ -247,6 +281,9 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
         private String[] mOtherBtnTitles;
         private int[] mOtherBtnTitleColors;
         private float mOtherBtnTextSize = -1;
+        private String[] mOtherBtnSubTitles;
+        private int[] mOtherBtnSubTitleColors;
+        private float mOtherBtnSubTextSize = -1;
         private boolean mCancelableOnTouchOutside;
         private ActionSheetListener mActionSheetListener;
 
@@ -283,6 +320,17 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
             return this;
         }
 
+        public Builder setOtherBtnSub(String[] titles, int[] titleColors) {
+            mOtherBtnSubTitles = titles;
+            mOtherBtnSubTitleColors = titleColors;
+            return this;
+        }
+
+        public Builder setOtherBtnSubTextSize(float textSize) {
+            mOtherBtnSubTextSize = textSize;
+            return this;
+        }
+
         public Builder setCancelableOnTouchOutside(boolean cancelable) {
             mCancelableOnTouchOutside = cancelable;
             return this;
@@ -309,6 +357,11 @@ public class ActionSheet extends DialogFragment implements View.OnClickListener 
             bundle.putIntArray(OTHER_BTN_TITLE_COLORS, mOtherBtnTitleColors);
             if (mOtherBtnTextSize > 0) {
                 bundle.putFloat(OTHER_BTN_TEXT_SIZE, mOtherBtnTextSize);
+            }
+            bundle.putStringArray(OTHER_BTN_SUB_TITLES, mOtherBtnSubTitles);
+            bundle.putIntArray(OTHER_BTN_SUB_TITLE_COLORS, mOtherBtnSubTitleColors);
+            if (mOtherBtnSubTextSize > 0) {
+                bundle.putFloat(OTHER_BTN_SUB_TEXT_SIZE, mOtherBtnSubTextSize);
             }
             bundle.putBoolean(CANCELABLE_ON_TOUCH_OUTSIDE, mCancelableOnTouchOutside);
 
