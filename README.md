@@ -5,7 +5,7 @@ ActionSheet on Android
 ### Add dependency
 ```
 dependencies {
-    compile 'com.github.zongjingyao:actionsheet:0.1.2'
+    compile 'com.github.zongjingyao:actionsheet:0.1.3'
 }
 ```
 ### Example
@@ -15,6 +15,8 @@ ActionSheet actionSheet = new ActionSheet.Builder()
         //.setTitleTextSize(20)
         .setOtherBtn(new String[]{"Btn0", "Btn1", "Btn2"}, new int[]{Color.BLACK, Color.GREEN, Color.GREEN})
         //.setOtherBtnTextSize(30)
+        .setOtherBtnSub(new String[]{null, "Btn1 sub", ""}, new int[]{Color.BLACK, Color.GRAY, Color.GREEN})
+        //.setOtherBtnSubTextSize(20)
         .setCancelBtn("Cancel", Color.RED)
         //.setCancelBtnTextSize(30)
         .setCancelableOnTouchOutside(true)
@@ -34,3 +36,4 @@ actionSheet.show(getFragmentManager());
 
 ## Screenshot
 ![screenshot](https://raw.githubusercontent.com/zongjingyao/AndroidActionSheet/master/screenshot/example.png)
+![screenshot](https://raw.githubusercontent.com/zongjingyao/AndroidActionSheet/master/screenshot/example1.png)
